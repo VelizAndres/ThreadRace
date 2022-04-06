@@ -234,6 +234,7 @@ static class Monitor
 
     private void btnPosicionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPosicionActionPerformed
         System.out.println("La posición actual libre para Región crítica es: " + posicion);
+        System.out.println(monitor.bufer[0]+" -- " +monitor.bufer[1]+" -- "+monitor.bufer[2]);
     }//GEN-LAST:event_btnPosicionActionPerformed
 
     /**
