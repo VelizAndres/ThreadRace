@@ -16,7 +16,7 @@ import javax.swing.JLabel;
  */
 public class frmMain extends javax.swing.JFrame {
     
-    int contador = 1;
+    static Monitor monitor = new Monitor(); // crea instancia de un nuevo monitor
     // Procesos
     Proceso hilo1;
     Proceso hilo2;
@@ -41,7 +41,6 @@ public class frmMain extends javax.swing.JFrame {
     public class Proceso extends Thread {
         int numeroAGenerar;
         JLabel miEtiqueta;
-        String status;
 
         public Proceso(JLabel etiqueta) {
             numeroAGenerar = 0;
@@ -54,17 +53,37 @@ public class frmMain extends javax.swing.JFrame {
             this.numeroAGenerar = (int)(Math.random()* 9 + 1);
             this.miEtiqueta.setText(String.valueOf(numeroAGenerar));
             // Región crítica
-            regionCritica[posicion] = this.numeroAGenerar;
+            monitor.insertar(this.numeroAGenerar);
+            regionCritica[posicion] = monitor.eliminar();
+            posicion++;
+            // Operaciones post región crítica
             String contenidoRC = "[" + String.valueOf(regionCritica[0]) + "]";
             contenidoRC += "[" + String.valueOf(regionCritica[1]) + "]";
             contenidoRC += "[" + String.valueOf(regionCritica[2]) + "]";
             lblRegionCritica.setText(contenidoRC);
-            posicion++;
-            // Operaciones post región crítica
             System.out.println("Proceso finalizado con status: 0");
         }
     }
+    
+static class Monitor
+    {
+        private int bufer[] = new int[3];
+        private int inf=0, sup=0; 
+          
+        public synchronized void insertar(int num){
+            bufer[sup]=num; // inserta un elemento en el búfer
+            sup++; // direccion en la que se colocara el siguiente elemento
+            System.out.println(num + " ingresado");
+        }
+        
+        public synchronized int eliminar(){
+            int num=0;
+             num=bufer[inf]; // obtiene un elemento del búfer
+             inf ++; // espacio del siguiente elemento que se obtendra
+             return num;
+        }
 
+}
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -211,13 +230,6 @@ public class frmMain extends javax.swing.JFrame {
         hilo1.start();
         hilo2.start();
         hilo3.start();
-        /*if (contador == 1)
-            hilo1.start();
-        if (contador == 2)
-            hilo2.start();
-        if (contador == 3)
-            hilo3.start();*/
-        contador++;
     }//GEN-LAST:event_btnIniciarActionPerformed
 
     private void btnPosicionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPosicionActionPerformed
